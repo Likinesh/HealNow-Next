@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
+import { revalidatePath } from "next/cache";
 
 const PLAN_CREDITS = {
   free_user: 0, // Basic plan: 2 credits

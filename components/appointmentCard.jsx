@@ -5,35 +5,14 @@ import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Calendar,
-  Clock,
-  User,
-  Video,
-  Stethoscope,
-  X,
-  Edit,
-  Loader2,
-  CheckCircle,
-} from "lucide-react";
+import { Calendar,Clock,User,Video,Stethoscope,X,Edit,Loader2,CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  cancelAppointment,
-  addAppointmentNotes,
-  markAppointmentCompleted,
-} from "@/actions/doctor";
-import { generateVideoToken } from "@/actions/appointments";
-import useFetch from "@/hooks/use-fetch";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { addAppointmentNotes, cancelAppointment, markAppointmentCompleted } from "@/actions/doctors";
+import { generateVideoToken } from "@/actions/appointments";
 
 export function AppointmentCard({
   appointment,
@@ -41,11 +20,10 @@ export function AppointmentCard({
   refetchAppointments,
 }) {
   const [open, setOpen] = useState(false);
-  const [action, setAction] = useState(null); // 'cancel', 'notes', 'video', or 'complete'
+  const [action, setAction] = useState(null); 
   const [notes, setNotes] = useState(appointment.notes || "");
   const router = useRouter();
 
-  // UseFetch hooks for server actions
   const {
     loading: cancelLoading,
     fn: submitCancel,
@@ -67,7 +45,6 @@ export function AppointmentCard({
     data: completeData,
   } = useFetch(markAppointmentCompleted);
 
-  // Format date and time
   const formatDateTime = (dateString) => {
     try {
       return format(new Date(dateString), "MMMM d, yyyy 'at' h:mm a");
@@ -85,7 +62,6 @@ export function AppointmentCard({
     }
   };
 
-  // Check if appointment can be marked as completed
   const canMarkCompleted = () => {
     if (userRole !== "DOCTOR" || appointment.status !== "SCHEDULED") {
       return false;
@@ -95,7 +71,6 @@ export function AppointmentCard({
     return now >= appointmentEndTime;
   };
 
-  // Handle cancel appointment
   const handleCancelAppointment = async () => {
     if (cancelLoading) return;
 
@@ -110,11 +85,9 @@ export function AppointmentCard({
     }
   };
 
-  // Handle mark as completed
   const handleMarkCompleted = async () => {
     if (completeLoading) return;
 
-    // Check if appointment end time has passed
     const now = new Date();
     const appointmentEndTime = new Date(appointment.endTime);
 
@@ -136,7 +109,6 @@ export function AppointmentCard({
     }
   };
 
-  // Handle save notes (doctor only)
   const handleSaveNotes = async () => {
     if (notesLoading || userRole !== "DOCTOR") return;
 
@@ -146,7 +118,6 @@ export function AppointmentCard({
     await submitNotes(formData);
   };
 
-  // Handle join video call
   const handleJoinVideoCall = async () => {
     if (tokenLoading) return;
 
@@ -157,7 +128,6 @@ export function AppointmentCard({
     await submitTokenRequest(formData);
   };
 
-  // Handle successful operations
   useEffect(() => {
     if (cancelData?.success) {
       toast.success("Appointment cancelled successfully");
@@ -196,7 +166,6 @@ export function AppointmentCard({
 
   useEffect(() => {
     if (tokenData?.success) {
-      // Redirect to video call page with token and session ID
       router.push(
         `/video-call?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`
       );
@@ -205,13 +174,11 @@ export function AppointmentCard({
     }
   }, [tokenData, appointment.id, router]);
 
-  // Determine if appointment is active (within 30 minutes of start time)
   const isAppointmentActive = () => {
     const now = new Date();
     const appointmentTime = new Date(appointment.startTime);
     const appointmentEndTime = new Date(appointment.endTime);
 
-    // Can join 30 minutes before start until end time
     return (
       (appointmentTime.getTime() - now.getTime() <= 30 * 60 * 1000 &&
         now < appointmentTime) ||
@@ -219,7 +186,6 @@ export function AppointmentCard({
     );
   };
 
-  // Determine other party information based on user role
   const otherParty =
     userRole === "DOCTOR" ? appointment.patient : appointment.doctor;
 

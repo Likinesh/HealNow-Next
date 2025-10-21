@@ -1,19 +1,19 @@
 import { TabsContent } from "@/components/ui/tabs";
 import { PendingDoctors } from "./components/pendingDoctors";
 import { VerifiedDoctors } from "./components/verifiedDoctors";
-// import { PendingPayouts } from "./components/pendingPayouts";
 import {
+  getPendingPayouts,
   pendingVerifications,
   verifiedDoctors,
 } from "@/actions/admin";
+import { PendingPayouts } from "./components/pendingPayouts";
 
 export default async function AdminPage() {
-  // Fetch all data in parallel
   const [pendingDoctorsData, verifiedDoctorsData] =
     await Promise.all([
       pendingVerifications(),
       verifiedDoctors(),
-    //   getPendingPayouts(),
+      getPendingPayouts(),
     ]);
 
   return (
@@ -26,9 +26,9 @@ export default async function AdminPage() {
         <VerifiedDoctors doctors={verifiedDoctorsData.doctors || []} />
       </TabsContent>
 
-      {/* <TabsContent value="payouts" className="border-none p-0">
+      <TabsContent value="payouts" className="border-none p-0">
         <PendingPayouts payouts={pendingPayoutsData.payouts || []} />
-      </TabsContent> */}
+      </TabsContent>
     </>
   );
 }

@@ -29,30 +29,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { approvePayout } from "@/actions/admin";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
 import { BarLoader } from "react-spinners";
+import { approvePayout } from "@/actions/admin";
 
 export function PendingPayouts({ payouts }) {
   const [selectedPayout, setSelectedPayout] = useState(null);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
 
-  // Custom hook for approve payout server action
   const { loading, data, fn: submitApproval } = useFetch(approvePayout);
 
-  // Handle view details
   const handleViewDetails = (payout) => {
     setSelectedPayout(payout);
   };
 
-  // Handle approve payout
   const handleApprovePayout = (payout) => {
     setSelectedPayout(payout);
     setShowApproveDialog(true);
   };
 
-  // Confirm approval
   const confirmApproval = async () => {
     if (!selectedPayout || loading) return;
 

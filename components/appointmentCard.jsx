@@ -167,7 +167,7 @@ export function AppointmentCard({
   useEffect(() => {
     if (tokenData?.success) {
       router.push(
-        `/video-call?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`
+        `/videocall?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`
       );
     } else if (tokenData?.error) {
       setAction(null);
@@ -376,7 +376,6 @@ export function AppointmentCard({
               </div>
             )}
 
-            {/* Join Video Call Button */}
             {appointment.status === "SCHEDULED" && (
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-muted-foreground">
@@ -406,7 +405,6 @@ export function AppointmentCard({
               </div>
             )}
 
-            {/* Doctor Notes (Doctor can view/edit, Patient can only view) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium text-muted-foreground">

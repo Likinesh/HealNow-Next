@@ -117,16 +117,16 @@ model Payout {
   id              String        @id @default(uuid())
   doctorId        String
   doctor          User          @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  amount          Float         // Total payout amount in USD
-  credits         Int           // Number of credits being paid out
-  platformFee     Float         // Platform fee deducted (2 USD per credit)
-  netAmount       Float         // Amount doctor receives (8 USD per credit)
-  paypalEmail     String        // Doctor's PayPal email for payout
+  amount          Float         
+  credits         Int           
+  platformFee     Float         
+  netAmount       Float         
+  paypalEmail     String        
   status          PayoutStatus  @default(PROCESSING)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  processedAt     DateTime?     // When admin marked it as processed
-  processedBy     String?       // Admin who processed it
+  processedAt     DateTime?    
+  processedBy     String?      
 
   @@index([status, createdAt])
   @@index([doctorId, status])

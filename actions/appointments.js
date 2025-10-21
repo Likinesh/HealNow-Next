@@ -296,7 +296,6 @@ export async function generateVideoToken(formData) {
       throw new Error("Appointment ID is required");
     }
 
-    // Find the appointment and verify the user is part of it
     const appointment = await db.appointment.findUnique({
       where: {
         id: appointmentId,
@@ -307,17 +306,14 @@ export async function generateVideoToken(formData) {
       throw new Error("Appointment not found");
     }
 
-    // Verify the user is either the doctor or the patient for this appointment
     if (appointment.doctorId !== user.id && appointment.patientId !== user.id) {
       throw new Error("You are not authorized to join this call");
     }
 
-    // Verify the appointment is scheduled
     if (appointment.status !== "SCHEDULED") {
       throw new Error("This appointment is not currently scheduled");
     }
 
-    // Verify the appointment is within a valid time range (e.g., starting 5 minutes before scheduled time)
     const now = new Date();
     const appointmentTime = new Date(appointment.startTime);
     const timeDifference = (appointmentTime - now) / (1000 * 60); // difference in minutes
@@ -328,11 +324,9 @@ export async function generateVideoToken(formData) {
       );
     }
 
-    // Generate a token for the video session
     // Token expires 2 hours after the appointment start time
     const appointmentEndTime = new Date(appointment.endTime);
-    const expirationTime =
-      Math.floor(appointmentEndTime.getTime() / 1000) + 60 * 60; // 1 hour after end time
+    const expirationTime = Math.floor(appointmentEndTime.getTime() / 1000) + 60 * 60; 
 
     // Use user's name and role as connection data
     const connectionData = JSON.stringify({
@@ -343,12 +337,11 @@ export async function generateVideoToken(formData) {
 
     // Generate the token with appropriate role and expiration
     const token = vonage.video.generateClientToken(appointment.videoSessionId, {
-      role: "publisher", // Both doctor and patient can publish streams
+      role: "publisher",
       expireTime: expirationTime,
       data: connectionData,
     });
 
-    // Update the appointment with the token
     await db.appointment.update({
       where: {
         id: appointmentId,

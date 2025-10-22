@@ -25,9 +25,9 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { requestPayout } from "@/actions/payout";
-import useFetch from "@/hooks/use-fetch";
+import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
+import { requestPayout } from "@/actions/doctors";
 
 export function DoctorEarnings({ earnings, payouts = [] }) {
   const [showPayoutDialog, setShowPayoutDialog] = useState(false);

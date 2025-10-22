@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { Loader2, Clock, ArrowLeft, Calendar, CreditCard } from "lucide-react";
 import { bookAppointment } from "@/actions/appointments";
 import { toast } from "sonner";
-import useFetch from "@/hooks/use-fetch";
+import useFetch from "@/hooks/useFetch";
 
 export function AppointmentForm({ doctorId, slot, onBack, onComplete }) {
   const [description, setDescription] = useState("");

@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
             {/* Footer */}
             <footer className="text-center p-4 bg-gray-100 mt-8">
               <p className="text-sm text-gray-600">
-                &copy; {new Date().getFullYear()} Medimeet. All rights reserved.
+                &copy; {new Date().getFullYear()} HealNow. All rights reserved.
               </p>
             </footer>
           </ThemeProvider>

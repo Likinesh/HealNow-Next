@@ -1,9 +1,6 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Shield, Check } from "lucide-react";
-import { PricingTable } from "@clerk/nextjs";
+import { ArrowLeft} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import Pricing from "@/components/pricing";
 
 export default async function PricingPage() {
@@ -41,13 +38,12 @@ export default async function PricingPage() {
       {/* Pricing Table Section */}
       <Pricing />
 
-      {/* FAQ Section - Optional */}
       <div className="max-w-3xl mx-auto mt-16 text-center">
         <h2 className="text-2xl font-bold text-white mb-2">
           Questions? We're Here to Help
         </h2>
         <p className="text-muted-foreground mb-4">
-          Contact our support team at support@medimeet.com
+          Contact our support team at support@healnow.com
         </p>
       </div>
     </div>

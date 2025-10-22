@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Check, Ban, Loader2, User, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { updateDoctorActiveStatus } from "@/actions/admin";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
+import { suspendDoctor } from "@/actions/admin";
 
 export function VerifiedDoctors({ doctors }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +25,7 @@ export function VerifiedDoctors({ doctors }) {
     loading,
     data,
     fn: submitStatusUpdate,
-  } = useFetch(updateDoctorActiveStatus);
+  } = useFetch(suspendDoctor);
 
   const filteredDoctors = doctors.filter((doctor) => {
     const query = searchTerm.toLowerCase();

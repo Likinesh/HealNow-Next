@@ -10,16 +10,15 @@ This platform allows patients to book appointments with doctors, manage schedule
 ### 👩‍⚕️ User Features
 - Role-based access for **patients** and **doctors**
 - Browse available doctors and their specialties
-- Schedule, reschedule, or cancel appointments
+- Schedule or cancel appointments
 - Join **secure video consultations** directly from the app
-- Receive appointment confirmation and reminders
+- Receive appointment confirmation
 
 ### ⚙️ Technical Features
 - Real-time video/audio calling via **Vonage Video API**
-- **Next.js 13+ App Router** for SSR and optimized routing
+- **Next.js 13+** for SSR and optimized routing
 - **Prisma ORM** for type-safe database access
-- **Tailwind CSS** + **shadcn/ui** for modern and responsive UI
-- Authentication & Authorization (JWT / NextAuth)
+- **Shadcn/ui** for modern and responsive UI
 - Fully modular and scalable architecture
 - RESTful API integration for backend services
 
@@ -34,7 +33,7 @@ This platform allows patients to book appointments with doctors, manage schedule
 | Styling                   | [Tailwind CSS](https://tailwindcss.com/)                              |
 | Database ORM              | [Prisma](https://www.prisma.io/)                                      |
 | Video/Audio Communication | [Vonage Video API](https://www.vonage.com/communications-apis/video/) |
-| Deployment                | [Vercel](https://vercel.com/) or Node.js server                       |
+| Deployment                | [Vercel](https://vercel.com/)                                         |
 | Language                  | JavaScript                                                            |
 -----------------------------------------------------------------------------------------------------
 ---
@@ -93,7 +92,7 @@ npx prisma migrate dev --name init
 ```bash
 npm run dev
 ```
-# Visit http://localhost:3000
+Visit http://localhost:3000
 
 🚀 Deployment
 You can deploy this app easily using Vercel or any Node.js hosting platform.

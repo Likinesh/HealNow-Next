@@ -29,7 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { toast } from "sonner";
 import { BarLoader } from "react-spinners";
 import { approvePayout } from "@/actions/admin";
@@ -38,7 +38,7 @@ export function PendingPayouts({ payouts }) {
   const [selectedPayout, setSelectedPayout] = useState(null);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
 
-  const { loading, data, fn: submitApproval } = useFetch(approvePayout);
+  const { loading, data, fn: submitApproval } = useServerAction(approvePayout);
 
   const handleViewDetails = (payout) => {
     setSelectedPayout(payout);

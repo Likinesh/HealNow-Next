@@ -8,13 +8,13 @@ import { format } from "date-fns";
 import { Loader2, Clock, ArrowLeft, Calendar, CreditCard } from "lucide-react";
 import { bookAppointment } from "@/actions/appointments";
 import { toast } from "sonner";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 
 export function AppointmentForm({ doctorId, slot, onBack, onComplete }) {
   const [description, setDescription] = useState("");
 
-  // Use the useFetch hook to handle loading, data, and error states
-  const { loading, data, fn: submitBooking } = useFetch(bookAppointment);
+  // Use the useServerAction hook to handle loading, data, and error states
+  const { loading, data, fn: submitBooking } = useServerAction(bookAppointment);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -27,7 +27,7 @@ export function AppointmentForm({ doctorId, slot, onBack, onComplete }) {
     formData.append("endTime", slot.endTime);
     formData.append("description", description);
 
-    // Submit booking using the function from useFetch
+    // Submit booking using the function from useServerAction
     await submitBooking(formData);
   };
 

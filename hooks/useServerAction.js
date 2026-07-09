@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 // cb - callback function that performs the async operation
-const useFetch = (cb) => {
+const useServerAction = (cb) => {
   const [data, setData] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,4 +26,4 @@ const useFetch = (cb) => {
   return { data, loading, error, fn, setData };
 };
 
-export default useFetch;
+export default useServerAction;

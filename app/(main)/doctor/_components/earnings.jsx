@@ -25,7 +25,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { toast } from "sonner";
 import { requestPayout } from "@/actions/doctors";
 
@@ -42,7 +42,7 @@ export function DoctorEarnings({ earnings, payouts = [] }) {
   } = earnings;
 
   // Custom hook for payout request
-  const { loading, data, fn: submitPayoutRequest } = useFetch(requestPayout);
+  const { loading, data, fn: submitPayoutRequest } = useServerAction(requestPayout);
 
   // Check if there's any pending payout
   const pendingPayout = payouts.find(

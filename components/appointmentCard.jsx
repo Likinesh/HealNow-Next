@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -49,22 +49,22 @@ export function AppointmentCard({
     loading: cancelLoading,
     fn: submitCancel,
     data: cancelData,
-  } = useFetch(cancelAppointment);
+  } = useServerAction(cancelAppointment);
   const {
     loading: notesLoading,
     fn: submitNotes,
     data: notesData,
-  } = useFetch(addAppointmentNotes);
+  } = useServerAction(addAppointmentNotes);
   const {
     loading: tokenLoading,
     fn: submitTokenRequest,
     data: tokenData,
-  } = useFetch(generateVideoToken);
+  } = useServerAction(generateVideoToken);
   const {
     loading: completeLoading,
     fn: submitMarkCompleted,
     data: completeData,
-  } = useFetch(markAppointmentCompleted);
+  } = useServerAction(markAppointmentCompleted);
 
   const formatDateTime = (dateString) => {
     try {

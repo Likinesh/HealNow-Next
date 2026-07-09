@@ -15,13 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Clock, Plus, Loader2, AlertCircle } from "lucide-react";
 import { format, set } from "date-fns";
 import { toast } from "sonner";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { setAvailability } from "@/actions/doctors";
 
 export function AvailabilitySettings({ slots }) {
   const [showForm, setShowForm] = useState(false);
 
-  const { loading, fn: submitSlots, data } = useFetch(setAvailability);
+  const { loading, fn: submitSlots, data } = useServerAction(setAvailability);
   const {
     register,
     handleSubmit,

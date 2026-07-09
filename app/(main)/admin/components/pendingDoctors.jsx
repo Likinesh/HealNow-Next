@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { useEffect } from "react";
 import { BarLoader } from "react-spinners";
 import { verifyDoctor } from "@/actions/admin";
@@ -34,7 +34,7 @@ export function PendingDoctors({ doctors }) {
     loading,
     data,
     fn: submitStatusUpdate,
-  } = useFetch(verifyDoctor);
+  } = useServerAction(verifyDoctor);
 
   // Open doctor details dialog
   const handleViewDetails = (doctor) => {

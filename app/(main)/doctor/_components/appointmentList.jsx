@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "lucide-react";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { getDoctorAppointments } from "@/actions/doctors";
 import { AppointmentCard } from "@/components/appointmentCard";
 
@@ -13,7 +13,7 @@ export default function DoctorAppointmentsList() {
     loading,
     data,
     fn: fetchAppointments,
-  } = useFetch(getDoctorAppointments);
+  } = useServerAction(getDoctorAppointments);
 
   useEffect(() => {
     fetchAppointments();

@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
-import useFetch from "@/hooks/useFetch";
+import useServerAction from "@/hooks/useServerAction";
 import { Loader, Stethoscope, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -42,7 +42,7 @@ const OnboardingPage = () => {
   const router = useRouter();
 
   //   // Custom hook for user role server action
-  const { loading, data, fn: submitUserRole } = useFetch(setUserRole);
+  const { loading, data, fn: submitUserRole } = useServerAction(setUserRole);
 
   const {
     register,

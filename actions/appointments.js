@@ -9,7 +9,7 @@ import { Auth } from "@vonage/auth";
 import { deductCreditsForAppointment } from "./credits";
 
 const credentials = new Auth({
-  applicationId: process.env.NEXT_PUBLIC_VONAGE_APPLICATION_ID,
+  applicationId: process.env.VONAGE_APPLICATION_ID,
   privateKey: process.env.VONAGE_PRIVATE_KEY,
 });
 const options = {};
@@ -50,14 +50,14 @@ export async function getAvailableTimeSlots(doctorId) {
       throw new Error("Doctor not found or not verified");
     }
 
-    const availability = await db.availability.findFirst({
+    const availabilities = await db.availability.findMany({
       where: {
         doctorId: doctor.id,
         status: "AVAILABLE",
       },
     });
 
-    if (!availability) {
+    if (availabilities.length === 0) {
       throw new Error("No availability set by doctor");
     }
 
@@ -81,58 +81,66 @@ export async function getAvailableTimeSlots(doctorId) {
       const dayString = format(day, "yyyy-MM-dd");
       availableSlotsByDay[dayString] = [];
 
-      const availabilityStart = new Date(availability.startTime);
-      const availabilityEnd = new Date(availability.endTime);
+      for (const availability of availabilities) {
+        const availabilityStart = new Date(availability.startTime);
+        const availabilityEnd = new Date(availability.endTime);
 
-      availabilityStart.setFullYear(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate()
-      );
-      availabilityEnd.setFullYear(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate()
-      );
+        availabilityStart.setFullYear(
+          day.getFullYear(),
+          day.getMonth(),
+          day.getDate()
+        );
+        availabilityEnd.setFullYear(
+          day.getFullYear(),
+          day.getMonth(),
+          day.getDate()
+        );
 
-      let current = new Date(availabilityStart);
-      const end = new Date(availabilityEnd);
+        let current = new Date(availabilityStart);
+        const end = new Date(availabilityEnd);
 
-      while (
-        isBefore(addMinutes(current, 30), end) || +addMinutes(current, 30) === +end
-      ) {
-        const next = addMinutes(current, 30);
+        while (
+          isBefore(addMinutes(current, 30), end) ||
+          +addMinutes(current, 30) === +end
+        ) {
+          const next = addMinutes(current, 30);
 
-        if (isBefore(current, now)) {
-          current = next;
-          continue;
-        }
+          if (isBefore(current, now)) {
+            current = next;
+            continue;
+          }
 
-        const overlaps = existingAppointments.some((appointment) => {
-          const aStart = new Date(appointment.startTime);
-          const aEnd = new Date(appointment.endTime);
+          const overlaps = existingAppointments.some((appointment) => {
+            const aStart = new Date(appointment.startTime);
+            const aEnd = new Date(appointment.endTime);
 
-          return (
-            (current >= aStart && current < aEnd) ||
-            (next > aStart && next <= aEnd) ||
-            (current <= aStart && next >= aEnd)
-          );
-        });
-
-        if (!overlaps) {
-          availableSlotsByDay[dayString].push({
-            startTime: current.toISOString(),
-            endTime: next.toISOString(),
-            formatted: `${format(current, "h:mm a")} - ${format(
-              next,
-              "h:mm a"
-            )}`,
-            day: format(current, "EEEE, MMMM d"),
+            return (
+              (current >= aStart && current < aEnd) ||
+              (next > aStart && next <= aEnd) ||
+              (current <= aStart && next >= aEnd)
+            );
           });
-        }
 
-        current = next;
+          if (!overlaps) {
+            availableSlotsByDay[dayString].push({
+              startTime: current.toISOString(),
+              endTime: next.toISOString(),
+              formatted: `${format(current, "h:mm a")} - ${format(
+                next,
+                "h:mm a"
+              )}`,
+              day: format(current, "EEEE, MMMM d"),
+            });
+          }
+
+          current = next;
+        }
       }
+
+      // Sort slots chronologically in case multiple availabilities generate out-of-order slots
+      availableSlotsByDay[dayString].sort(
+        (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
     }
 
     const result = Object.entries(availableSlotsByDay).map(([date, slots]) => ({
@@ -168,6 +176,19 @@ export async function bookAppointment(formData) {
 
     if (!patient) {
       throw new Error("Patient not found");
+    }
+
+    const recentBooking = await db.appointment.findFirst({
+      where: {
+        patientId: patient.id,
+        createdAt: {
+          gte: new Date(Date.now() - 60000), // 1 minute ago
+        },
+      },
+    });
+
+    if (recentBooking) {
+      throw new Error("Please wait a minute before booking another appointment");
     }
 
     const doctorId = formData.get("doctorId");
@@ -342,15 +363,7 @@ export async function generateVideoToken(formData) {
       data: connectionData,
     });
 
-    await db.appointment.update({
-      where: {
-        id: appointmentId,
-      },
-      data: {
-        videoSessionToken: token,
-      },
-    });
-
+    // Return token directly — do NOT store in DB (race condition + security risk)
     return {
       success: true,
       videoSessionId: appointment.videoSessionId,

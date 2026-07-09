@@ -20,9 +20,9 @@ import { checkUser } from "@/lib/checkUser";
 import { checkandAllocateCredits } from "@/actions/credits";
 import { Badge } from "./ui/badge";
 
-const Header = async() => {
+const Header = async () => {
   const user = await checkUser();
-  if(user?.role === "PATIENT"){
+  if (user?.role === "PATIENT") {
     const credits = await checkandAllocateCredits(user);
   }
   return (
@@ -129,23 +129,25 @@ const Header = async() => {
               </Badge>
             </Link>
           )}
-          
+
           <SignedOut>
             <SignInButton>
-                <Button variant="secondary" className="mr-4">Sign In</Button>
+              <Button variant="secondary" className="mr-4">
+                Sign In
+              </Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
             <UserButton
-            appearance={{
-                elements:{
-                    avatarBox: "w-10 h-10",
-                    userButtonPopoverCard: "shadow-xl",
-                    userButtonPopoverFooter: "hidden",
-                    userPreviewMainIdentifier:" font-semibold",
-                }
-            }}
-             />
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10",
+                  userButtonPopoverCard: "shadow-xl",
+                  userButtonPopoverFooter: "hidden",
+                  userPreviewMainIdentifier: " font-semibold",
+                },
+              }}
+            />
           </SignedIn>
         </div>
       </nav>

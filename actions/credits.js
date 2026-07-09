@@ -114,12 +114,16 @@ export async function deductCreditsForAppointment(userId, doctorId) {
       where: { id: doctorId },
     });
 
-    if (user.credits < APPOINTMENT_CREDIT_COST) {
-      throw new Error("Insufficient credits to book an appointment");
+    if (!user) {
+      throw new Error("User not found");
     }
 
     if (!doctor) {
       throw new Error("Doctor not found");
+    }
+
+    if (user.credits < APPOINTMENT_CREDIT_COST) {
+      throw new Error("Insufficient credits to book an appointment");
     }
 
     const result = await db.$transaction(async (tx) => {

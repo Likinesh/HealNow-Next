@@ -9,7 +9,7 @@ import {
 import { PendingPayouts } from "./components/pendingPayouts";
 
 export default async function AdminPage() {
-  const [pendingDoctorsData, verifiedDoctorsData] =
+  const [pendingDoctorsData, verifiedDoctorsData, pendingPayoutsData] =
     await Promise.all([
       pendingVerifications(),
       verifiedDoctors(),

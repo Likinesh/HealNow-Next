@@ -47,10 +47,10 @@ export async function setAvailability(formData) {
       throw new Error("Doctor not found");
     }
 
-    const startTime = formData.get("startTime");
-    const endTime = formData.get("endTime");
+    const startTime = new Date(formData.get("startTime"));
+    const endTime = new Date(formData.get("endTime"));
 
-    if (!startTime || !endTime) {
+    if (!startTime || !endTime || isNaN(startTime) || isNaN(endTime)) {
       throw new Error("Start time and end time are required");
     }
 
@@ -64,18 +64,14 @@ export async function setAvailability(formData) {
       },
     });
 
-    if(existingSlots.length > 0){
-      const slotWithNoBooking = existingSlots.filter(
-        (slot) => !slot.appointment
-      );
-
-      if(slotWithNoBooking.length > 0){
-        await db.availability.deleteMany({
-          where:{
-            id: {in: slotWithNoBooking.map(slot => slot.id)}
-          }
-        });
-      }
+    if (existingSlots.length > 0) {
+      // Only delete slots that are still AVAILABLE (not BOOKED)
+      await db.availability.deleteMany({
+        where: {
+          doctorId: doctor.id,
+          status: "AVAILABLE",
+        },
+      });
     }
 
     const newSlot = await db.availability.create({
@@ -130,7 +126,6 @@ export async function getDoctorAvailability() {
 }
 
 export async function getDoctorAppointments() {
-  // return [];
   const { userId } = await auth();
 
   if (!userId) {
@@ -153,7 +148,7 @@ export async function getDoctorAppointments() {
       where: {
         doctorId: doctor.id,
         status: {
-          in: ["SCHEDULED"],
+          in: ["SCHEDULED", "COMPLETED", "CANCELLED"],
         },
       },
       include: {
@@ -226,7 +221,7 @@ export async function cancelAppointment(formData) {
         data: {
           userId: appointment.patientId,
           amount: 2,
-          type: "APPOINTMENT_DEDUCTION",
+          type: "ADMIN_ADJUSTMENT", // Refund on cancellation
         },
       });
 
@@ -424,6 +419,11 @@ export async function requestPayout(formData) {
       throw new Error("PayPal email is required");
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(paypalEmail)) {
+      throw new Error("Invalid PayPal email address");
+    }
+
     const existingPendingPayout = await db.payout.findFirst({
       where: {
         doctorId: doctor.id,
@@ -439,10 +439,6 @@ export async function requestPayout(formData) {
 
     const creditCount = doctor.credits;
 
-    if (creditCount === 0) {
-      throw new Error("No credits available for payout");
-    }
-
     if (creditCount < 1) {
       throw new Error("Minimum 1 credit required for payout");
     }
@@ -451,16 +447,34 @@ export async function requestPayout(formData) {
     const platformFee = creditCount * PLATFORM_FEE_PER_CREDIT;
     const netAmount = creditCount * DOCTOR_EARNINGS_PER_CREDIT;
 
-    const payout = await db.payout.create({
-      data: {
-        doctorId: doctor.id,
-        amount: totalAmount,
-        credits: creditCount,
-        platformFee,
-        netAmount,
-        paypalEmail,
-        status: "PROCESSING",
-      },
+    const payout = await db.$transaction(async (tx) => {
+      const newPayout = await tx.payout.create({
+        data: {
+          doctorId: doctor.id,
+          amount: totalAmount,
+          credits: creditCount,
+          platformFee,
+          netAmount,
+          paypalEmail,
+          status: "PROCESSING",
+        },
+      });
+
+      // Deduct credits immediately
+      await tx.user.update({
+        where: { id: doctor.id },
+        data: { credits: { decrement: creditCount } },
+      });
+
+      await tx.creditTransaction.create({
+        data: {
+          userId: doctor.id,
+          amount: -creditCount,
+          type: "PAYOUT",
+        },
+      });
+
+      return newPayout;
     });
 
     revalidatePath("/doctor");
@@ -544,8 +558,9 @@ export async function getDoctorEarnings() {
     const thisMonthEarnings =
       thisMonthAppointments.length * 2 * DOCTOR_EARNINGS_PER_CREDIT;
 
+    const monthsSinceJoined = Math.max(1, (Date.now() - new Date(doctor.createdAt).getTime()) / (30 * 24 * 60 * 60 * 1000));
     const averageEarningsPerMonth = totalEarnings > 0
-        ? totalEarnings / Math.max(1, new Date().getMonth() + 1)
+        ? totalEarnings / monthsSinceJoined
         : 0;
 
     const availableCredits = doctor.credits;

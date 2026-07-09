@@ -5,13 +5,34 @@ import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar,Clock,User,Video,Stethoscope,X,Edit,Loader2,CheckCircle } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  User,
+  Video,
+  Stethoscope,
+  X,
+  Edit,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { addAppointmentNotes, cancelAppointment, markAppointmentCompleted } from "@/actions/doctors";
+import {
+  addAppointmentNotes,
+  cancelAppointment,
+  markAppointmentCompleted,
+} from "@/actions/doctors";
 import { generateVideoToken } from "@/actions/appointments";
 
 export function AppointmentCard({
@@ -20,7 +41,7 @@ export function AppointmentCard({
   refetchAppointments,
 }) {
   const [open, setOpen] = useState(false);
-  const [action, setAction] = useState(null); 
+  const [action, setAction] = useState(null);
   const [notes, setNotes] = useState(appointment.notes || "");
   const router = useRouter();
 
@@ -76,7 +97,7 @@ export function AppointmentCard({
 
     if (
       window.confirm(
-        "Are you sure you want to cancel this appointment? This action cannot be undone."
+        "Are you sure you want to cancel this appointment? This action cannot be undone.",
       )
     ) {
       const formData = new FormData();
@@ -93,14 +114,14 @@ export function AppointmentCard({
 
     if (now < appointmentEndTime) {
       alert(
-        "Cannot mark appointment as completed before the scheduled end time."
+        "Cannot mark appointment as completed before the scheduled end time.",
       );
       return;
     }
 
     if (
       window.confirm(
-        "Are you sure you want to mark this appointment as completed? This action cannot be undone."
+        "Are you sure you want to mark this appointment as completed? This action cannot be undone.",
       )
     ) {
       const formData = new FormData();
@@ -167,7 +188,7 @@ export function AppointmentCard({
   useEffect(() => {
     if (tokenData?.success) {
       router.push(
-        `/videocall?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`
+        `/videocall?sessionId=${tokenData.videoSessionId}&token=${tokenData.token}&appointmentId=${appointment.id}`,
       );
     } else if (tokenData?.error) {
       setAction(null);
@@ -214,7 +235,7 @@ export function AppointmentCard({
                 )}
                 {userRole === "PATIENT" && (
                   <p className="text-sm text-muted-foreground">
-                    {otherParty.specialty}
+                    {otherParty.speciality}
                   </p>
                 )}
                 <div className="flex items-center mt-2 text-sm text-muted-foreground">
@@ -237,8 +258,8 @@ export function AppointmentCard({
                   appointment.status === "COMPLETED"
                     ? "bg-emerald-900/20 border-emerald-900/30 text-emerald-400"
                     : appointment.status === "CANCELLED"
-                    ? "bg-red-900/20 border-red-900/30 text-red-400"
-                    : "bg-amber-900/20 border-amber-900/30 text-amber-400"
+                      ? "bg-red-900/20 border-red-900/30 text-red-400"
+                      : "bg-amber-900/20 border-amber-900/30 text-amber-400"
                 }
               >
                 {appointment.status}
@@ -312,7 +333,7 @@ export function AppointmentCard({
                   )}
                   {userRole === "PATIENT" && (
                     <p className="text-muted-foreground text-sm">
-                      {otherParty.specialty}
+                      {otherParty.speciality}
                     </p>
                   )}
                 </div>
@@ -352,8 +373,8 @@ export function AppointmentCard({
                   appointment.status === "COMPLETED"
                     ? "bg-emerald-900/20 border-emerald-900/30 text-emerald-400"
                     : appointment.status === "CANCELLED"
-                    ? "bg-red-900/20 border-red-900/30 text-red-400"
-                    : "bg-amber-900/20 border-amber-900/30 text-amber-400"
+                      ? "bg-red-900/20 border-red-900/30 text-red-400"
+                      : "bg-amber-900/20 border-amber-900/30 text-amber-400"
                 }
               >
                 {appointment.status}

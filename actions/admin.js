@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server"
@@ -135,7 +135,7 @@ export async function suspendDoctor(formData) {
 }
 
 export async function getPendingPayouts() {
-  const isAdmin = await verifyAdmin();
+  const isAdmin = await adminVerify();
   if (!isAdmin) throw new Error("Unauthorized");
 
   try {
@@ -149,7 +149,7 @@ export async function getPendingPayouts() {
             id: true,
             name: true,
             email: true,
-            specialty: true,
+            speciality: true,
             credits: true,
           },
         },
@@ -167,7 +167,7 @@ export async function getPendingPayouts() {
 }
 
 export async function approvePayout(formData) {
-  const isAdmin = await verifyAdmin();
+  const isAdmin = await adminVerify();
   if (!isAdmin) throw new Error("Unauthorized");
 
   const payoutId = formData.get("payoutId");
@@ -209,25 +209,6 @@ export async function approvePayout(formData) {
           status: "PROCESSED",
           processedAt: new Date(),
           processedBy: admin?.id || "unknown",
-        },
-      });
-
-      await tx.user.update({
-        where: {
-          id: payout.doctorId,
-        },
-        data: {
-          credits: {
-            decrement: payout.credits,
-          },
-        },
-      });
-
-      await tx.creditTransaction.create({
-        data: {
-          userId: payout.doctorId,
-          amount: -payout.credits,
-          type: "ADMIN_ADJUSTMENT",
         },
       });
     });
